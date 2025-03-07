@@ -12,15 +12,28 @@ const getAllMessage = async (req, res, next) => {
         .json({ message: `Chat room with ID: ${chatRoomId} was not found` });
     }
 
-    const messages = await Message.find({ chatRoom: chatRoomId });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const totalMessages = await Message.countDocuments();
+    const messages = await Message.find({ chatRoom: chatRoomId })
+      .find()
+      .skip(skip)
+      .limit(limit)
+      .exec();
 
-    if (!messages) {
+    if (!messages || messages.length === 0) {
       return res
         .status(404)
         .json({ message: `No messages found in chat room: ${chatRoom.name}` });
     }
 
-    return res.status(200).json({ messages });
+    return res.status(200).json({
+      messages,
+      currentPage: page,
+      totalPages: Math.ceil(totalMessages / limit),
+      totalMessages,
+    });
   } catch (err) {
     return next(err);
   }
@@ -106,11 +119,9 @@ const deleteAllMessage = async (req, res, next) => {
     }
 
     if (chatRoom.host.toString() !== userId) {
-      return res
-        .status(403)
-        .json({
-          error: "Unauthorised: only the host can delete all messages.",
-        });
+      return res.status(403).json({
+        error: "Unauthorised: only the host can delete all messages.",
+      });
     }
 
     await Message.deleteMany({ chatRoom: chatRoomId });

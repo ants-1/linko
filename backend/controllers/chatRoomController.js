@@ -3,13 +3,22 @@ import ChatRoom from "../models/chatRoom.js";
 
 const getAllChatRooms = async (req, res, next) => {
   try {
-    const chatRooms = await ChatRoom.find().exec();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const totalChatRooms = await ChatRoom.countDocuments();
+    const chatRooms = await ChatRoom.find().skip(skip).limit(limit).exec();
 
-    if (chatRooms.length === 0 || !chatRooms) {
+    if (!chatRooms || chatRooms.length === 0) {
       return res.status(404).json({ message: "No chat rooms found." });
     }
 
-    return res.status(200).json({ chatRooms });
+    return res.status(200).json({
+      chatRooms,
+      currentPage: page,
+      totalPages: Math.ceil(totalChatRooms / limit),
+      totalChatRooms,
+    });
   } catch (err) {
     return next(err);
   }
@@ -159,11 +168,9 @@ const leaveChatRoom = async (req, res, next) => {
     const userExists = chatRoom.users.some((id) => id.equals(userId));
 
     if (userExists) {
-      return res
-        .status(400)
-        .json({
-          error: `Error occured when removing user from chat room: ${chatRoom.name}`,
-        });
+      return res.status(400).json({
+        error: `Error occured when removing user from chat room: ${chatRoom.name}`,
+      });
     }
 
     return res.status(200).json({
