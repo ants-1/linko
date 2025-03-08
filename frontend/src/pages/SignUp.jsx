@@ -1,10 +1,17 @@
-import { Link } from "react-router-dom";
+import { Container } from "@mui/material";
+import SignUpForm from "../components/SignUpForm";
 
 export default function SignUp() {
   return (
-    <>
-      <h1>Sign Up Page</h1>
-      <Link to="/login">Login</Link>
-    </>
+    <Container
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "120vh",
+      }}
+    >
+      <SignUpForm />
+    </Container>
   );
 }
