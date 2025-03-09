@@ -15,7 +15,7 @@ const signUp = async (req, res, next) => {
 
     req.login(user, { session: false }, async (loginErr) => {
       if (loginErr) {
-        return res.status(400).json({ error: "Erro during login process." });
+        return res.status(400).json({ error: "Error during login process." });
       }
 
       try {
@@ -35,7 +35,7 @@ const login = async (req, res, next) => {
     }
 
     if (!user) {
-      return res.status(401).json({ error: "Invalid credentials." });
+      return res.status(401).json({ error: "Invalid username or password." });
     }
 
     req.login(user, { session: false }, async (loginErr) => {
