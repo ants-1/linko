@@ -1,3 +1,8 @@
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useSignUpMutation } from "../slices/userApiSlice";
+import { setCredentials } from "../slices/authSlice";
 import {
   Container,
   Typography,
@@ -5,31 +10,57 @@ import {
   TextField,
   Button,
   Card,
+  Alert,
 } from "@mui/material";
-import { useState } from "react";
-import { Link } from "react-router";
 
 export default function SignUpForm() {
-  const [username, setUsername] = useState();
-  const [name, setName] = useState();
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-  const [confirmPassword, setConfirmPassword] = useState();
+  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({}); 
 
-  const handleSubmit = (e) => {
-    e.precentDefault();
-    console.log(
-      "Username:",
-      username,
-      "Name:",
-      name,
-      "Email:",
-      email,
-      "Password:",
-      password,
-      "Confirm Password",
-      confirmPassword
-    );
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [signUp, { isLoading }] = useSignUpMutation();
+  const { userInfo } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate("/home");
+    }
+  }, [navigate, userInfo]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setFieldErrors({});
+
+    const newErrors = {};
+    if (!username.trim()) newErrors.username = "*Username is required";
+    if (!name.trim()) newErrors.name = "*Name is required";
+    if (!email.trim()) newErrors.email = "*Email is required";
+    if (!password.trim()) newErrors.password = "*Password is required";
+    if (!confirmPassword.trim())
+      newErrors.confirmPassword = "*Confirm Password is required";
+    if (password && confirmPassword && password !== confirmPassword)
+      newErrors.confirmPassword = "*Passwords do not match";
+
+    if (Object.keys(newErrors).length > 0) {
+      setFieldErrors(newErrors);
+      return;
+    }
+
+    try {
+      const res = await signUp({ username, name, email, password }).unwrap();
+      dispatch(setCredentials(res));
+      navigate("/home");
+    } catch (err) {
+      setError(err?.data?.message || "Sign up failed");
+    }
   };
 
   return (
@@ -48,6 +79,9 @@ export default function SignUpForm() {
         >
           Sign Up
         </Typography>
+
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
         <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
           <TextField
             label="Username"
@@ -57,6 +91,8 @@ export default function SignUpForm() {
             color="secondary"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            error={!!fieldErrors.username}
+            helperText={fieldErrors.username}
           />
           <TextField
             label="Email"
@@ -66,6 +102,8 @@ export default function SignUpForm() {
             color="secondary"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            error={!!fieldErrors.email}
+            helperText={fieldErrors.email}
           />
           <TextField
             label="Name"
@@ -75,6 +113,8 @@ export default function SignUpForm() {
             color="secondary"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            error={!!fieldErrors.name}
+            helperText={fieldErrors.name}
           />
           <TextField
             label="Password"
@@ -85,6 +125,8 @@ export default function SignUpForm() {
             color="secondary"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            error={!!fieldErrors.password}
+            helperText={fieldErrors.password}
           />
           <TextField
             label="Confirm Password"
@@ -95,18 +137,21 @@ export default function SignUpForm() {
             color="secondary"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            error={!!fieldErrors.confirmPassword}
+            helperText={fieldErrors.confirmPassword}
           />
-          <Link>
-            <Button
-              type="submit"
-              variant="contained"
-              color="secondary"
-              fullWidth
-              sx={{ mt: 10, p: 1.5, fontWeight: "bold" }}
-            >
-              Sign Up
-            </Button>
-          </Link>
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="secondary"
+            fullWidth
+            disabled={isLoading}
+            sx={{ mt: 3, p: 1.5, fontWeight: "bold" }}
+          >
+            {isLoading ? "Signing up..." : "Sign Up"}
+          </Button>
+
           <Typography sx={{ mt: 3, textAlign: "center" }}>
             Already have an account? <Link to="/">Login!</Link>
           </Typography>

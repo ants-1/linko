@@ -1,4 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useLoginMutation } from "../slices/userApiSlice.js";
+import { setCredentials } from "../slices/authSlice.js";
 import {
   Container,
   Typography,
@@ -7,17 +11,37 @@ import {
   Button,
   Card,
   Divider,
+  Alert,
 } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
-import { Link } from "react-router";
 
 export default function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [login, { isLoading }] = useLoginMutation();
+  const { userInfo } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate("/home");
+    }
+  }, [navigate, userInfo]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Username:", username, "Password:", password);
+    setError(null);
+    try {
+      const res = await login({ username, password }).unwrap();
+      dispatch(setCredentials(res));
+      navigate("/home");
+    } catch (err) {
+      setError(err?.data?.error || "Invalid username or password");
+    }
   };
 
   return (
@@ -56,30 +80,31 @@ export default function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Link>
-            <Button
-              type="submit"
-              variant="contained"
-              color="secondary"
-              fullWidth
-              sx={{ mt: 12, p: 2, fontWeight: "bold" }}
-            >
-              Login
-            </Button>
-          </Link>
+          {error && (
+            <Alert severity="error" sx={{ my: 2 }}>
+              {error}
+            </Alert>
+          )}
+          <Button
+            type="submit"
+            variant="contained"
+            color="secondary"
+            fullWidth
+            disabled={isLoading}
+            sx={{ mt: 3, p: 2, fontWeight: "bold" }}
+          >
+            {isLoading ? "Logging in..." : "Login"}
+          </Button>
           <Divider sx={{ mt: 3 }} />
-          <Link>
-            <Button
-              type="submit"
-              variant="outlined"
-              color="secondary"
-              fullWidth
-              sx={{ mt: 3, p: 1.5 }}
-            >
-              Sign in with Google{" "}
-              <GoogleIcon color="secondary" sx={{ ml: 1, mb: 0.5 }} />
-            </Button>
-          </Link>
+          <Button
+            variant="outlined"
+            color="secondary"
+            fullWidth
+            sx={{ mt: 3, p: 1.5 }}
+          >
+            Sign in with Google{" "}
+            <GoogleIcon color="secondary" sx={{ ml: 1, mb: 0.5 }} />
+          </Button>
           <Typography sx={{ mt: 3, textAlign: "center" }}>
             Don't have an account? <Link to="/sign-up">Sign up!</Link>
           </Typography>
