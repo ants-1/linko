@@ -5,7 +5,7 @@ export interface IUser {
   googleId?: string;
   username: string;
   email: string;
-  password: string;
+  password?: string;
   avatarUrl?: string;
   description?: string;
   followers?: Types.ObjectId[];
@@ -35,7 +35,6 @@ const UserSchema = new Schema<IUser, UserModel>({
   password: {
     type: String,
     minlength: 7,
-    required: true,
   },
   avatarUrl: {
     type: String,

@@ -14,6 +14,7 @@ import {
   Alert,
 } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
+import { jwtDecode } from "jwt-decode";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -32,6 +33,23 @@ export default function LoginForm() {
     }
   }, [navigate, userInfo]);
 
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+
+    if (token) {
+      const decoded: any = jwtDecode(token);
+      const user = {
+        token,
+        username: decoded.username,
+        email: decoded.email,
+      };
+      dispatch(setCredentials(user));
+      navigate("/home");
+    }
+  }, [dispatch, navigate]);
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setError(null);
@@ -42,6 +60,10 @@ export default function LoginForm() {
     } catch (err: any) {
       setError(err?.data?.error || "Invalid username or password");
     }
+  }
+
+  const handleGoogleLogin = async () => {
+    window.location.href = "http://localhost:5001/api/v1/auth/google";
   }
 
   return (
@@ -101,6 +123,7 @@ export default function LoginForm() {
             color="primary"
             fullWidth
             sx={{ mt: 3, p: 1.5 }}
+            onClick={handleGoogleLogin}
           >
             Sign in with Google{" "}
             <GoogleIcon color="primary" sx={{ ml: 1, mb: 0.5 }} />

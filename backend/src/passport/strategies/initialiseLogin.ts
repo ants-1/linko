@@ -13,13 +13,13 @@ const initialiseLogin = (): void => {
       },
       async (email: string, password: string, done: Function) => {
         try {
-          const user: IUser | null = await userModel.findOne({ email });
+          const user = await userModel.findOne({ email });
 
           if (!user) {
             return done(null, false, { message: "User not found. Please register." });
           }
 
-          const matchedPassword = await bcrypt.compare(password, user.password);
+          const matchedPassword = await bcrypt.compare(password, user.password!);
 
           if (!matchedPassword) {
             return done(null, false, { message: "Invalid password" });

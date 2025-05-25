@@ -3,6 +3,7 @@ import { Box, CssBaseline } from "@mui/material";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Home from "./pages/Home";
+import GoogleCallback from "./components/GoogleCallback";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/google/callback" element={<GoogleCallback />} />
       </Routes>
     </Box>
   );

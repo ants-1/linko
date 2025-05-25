@@ -128,7 +128,27 @@ const googleCallback = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {};
+): Promise<void> => {
+  passport.authenticate(
+    "google",
+    { session: false },
+    async (err: Error, user: IUser) => {
+      if (err || !user) {
+        return res.status(400).json({ error: "Google authentication failed" });
+      }
+
+      try {
+        const token = generateToken(user);
+
+        res.redirect(
+          `${process.env.CLIENT_URL}/google/callback?token=${token}`
+        );
+      } catch (err) {
+        return next(err);
+      }
+    }
+  )(req, res, next);
+};
 
 export default {
   signUp,
