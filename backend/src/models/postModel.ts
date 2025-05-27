@@ -23,7 +23,7 @@ const PostSchema = new Schema<IPost, PostModel>({
   },
   imgUrl: {
     type: String,
-    default: ''
+    default: 'https://placehold.co/600x400/png'
   },
   content: {
     type: String,

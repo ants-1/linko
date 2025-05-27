@@ -8,6 +8,8 @@ import Blog from "./pages/Blog";
 import Chat from "./pages/Chat";
 import Feed from "./pages/Feed";
 import Profile from "./pages/Profile";
+import CreatePostForm from "./components/CreatePostForm";
+import EditPostForm from "./components/EditPostForm";
 import MainLayout from "./layouts/MainLayout";
 import AuthLayout from "./layouts/AuthLayout";
 
@@ -28,6 +30,8 @@ function App() {
           <Route path="/chat" element={<Chat />} />
           <Route path="/feed" element={<Feed />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/post/create" element={<CreatePostForm />} />
+          <Route path="/posts/:id/edit" element={<EditPostForm />} />
         </Route>
       </Routes >
     </>

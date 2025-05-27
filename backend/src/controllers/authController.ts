@@ -75,7 +75,7 @@ const login = async (
         return res.status(200).json({
           success: true,
           token,
-          user
+          user,
         });
       } catch (tokenErr) {
         return next(tokenErr);
@@ -140,12 +140,16 @@ const googleCallback = async (
 
       try {
         const token = generateToken(user);
-        console.log(user)
-        const redirectUrl = new URL(`${process.env.CLIENT_URL}/google/callback`);
+
+        const redirectUrl = new URL(
+          `${process.env.CLIENT_URL}/google/callback`
+        );
         redirectUrl.searchParams.append("token", token);
+        redirectUrl.searchParams.append("userId", user._id.toString());
         redirectUrl.searchParams.append("username", user.username);
         redirectUrl.searchParams.append("email", user.email);
         redirectUrl.searchParams.append("avatarUrl", user.avatarUrl || "");
+        console.log(redirectUrl.toString())
 
         res.redirect(redirectUrl.toString());
       } catch (err) {

@@ -23,7 +23,7 @@ const getAllPosts = async (
       .find()
       .skip(skip)
       .limit(limit)
-      .populate("author", "username")
+      .populate("author", "username avatarUrl")
       .exec();
 
     return res.status(200).json({
@@ -112,6 +112,7 @@ const createPost = [
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
       let imageUrl: any = "";
+      console.log('Request body:', req.body);
 
       if (req.file) {
         try {
@@ -147,7 +148,7 @@ const createPost = [
 
       await newPost.save();
 
-      return res.status(200).json(newPost);
+      return res.status(201).json(newPost);
     } catch (err) {
       return next(err);
     }

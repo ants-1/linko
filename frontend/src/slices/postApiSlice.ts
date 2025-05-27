@@ -17,19 +17,40 @@ export const postApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+    fetchPost: builder.query({
+      query: ({ id }: { id: string; }) => ({
+        url: `${POST_URL}/${id}`,
+        method: "GET",
+      }),
+    }),
+
     createPost: builder.mutation({
-      query: (data: any) => ({
-        url: `${POST_URL}`,
+      query: ({ formData, token }: { formData: FormData; token: string }) => ({
+        url: POST_URL,
         method: "POST",
-        body: data,
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }),
     }),
 
     editPost: builder.mutation({
-      query: ({ id, data }: { id: string; data: any }) => ({
+      query: ({
+        id,
+        formData,
+        token,
+      }: {
+        id: string;
+        formData: any;
+        token: string;
+      }) => ({
         url: `${POST_URL}/${id}`,
         method: "PUT",
-        body: data,
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }),
     }),
 
@@ -45,6 +66,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
 export const {
   useFetchPostsQuery,
   useFetchFeedPostsQuery,
+  useFetchPostQuery,
   useCreatePostMutation,
   useEditPostMutation,
   useDeletePostMutation,

@@ -12,12 +12,13 @@ export default function GoogleCallback() {
     const params = new URLSearchParams(location.search);
 
     const token = params.get("token");
+    const userId = params.get("userId");
     const username = params.get("username");
     const email = params.get("email");
     const avatarUrl = params.get("avatarUrl");
 
     if (token && username && email) {
-      dispatch(setCredentials({ token, user: { username, email, avatarUrl } }));
+      dispatch(setCredentials({ token, user: { userId, username, email, avatarUrl } }));
       navigate("/home");
     } else {
       navigate("/login");

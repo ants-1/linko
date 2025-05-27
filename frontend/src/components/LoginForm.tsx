@@ -42,6 +42,7 @@ export default function LoginForm() {
       const decoded: any = jwtDecode(token);
       const user = {
         token,
+        userId: decoded.userId,
         username: decoded.username,
         email: decoded.email,
       };
