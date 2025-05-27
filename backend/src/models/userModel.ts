@@ -51,7 +51,8 @@ const UserSchema = new Schema<IUser, UserModel>({
     { type: Schema.Types.ObjectId, ref: 'User' }
   ],
   dateJoined: {
-    type: Date, default: Date.now 
+    type: Date,
+    default: Date.now()
   }
 });
 

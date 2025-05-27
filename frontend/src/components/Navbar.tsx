@@ -163,7 +163,7 @@ export default function Navbar() {
               <>
                 <Tooltip title="Open settings">
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar alt={username} src={avatarUrl} />
+                    <Avatar alt={username} src={avatarUrl} sx={{ backgroundColor: "white", color: "black" }} />
                   </IconButton>
                 </Tooltip>
 
