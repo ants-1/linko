@@ -15,11 +15,23 @@ import PostMenu from "./PostMenuButton";
 import { Avatar } from "@mui/material";
 import { useSelector } from "react-redux";
 
+// 👍 Like slice
+import {
+  useFetchLikeCountQuery,
+  useToggleLikeMutation,
+} from "../slices/likeApiSlice";
+
+// 👎 Dislike slice
+import {
+  useFetchDislikeCountQuery,
+  useToggleDislikeMutation,
+} from "../slices/dislikeApiSlice";
 
 export default function PostCard({ post }: { post: any }) {
-  const { userInfo } = useSelector((state: any) =>
-    state.auth);
+  const { userInfo } = useSelector((state: any) => state.auth);
   const userId = userInfo?.user.userId;
+  const postId = post._id;
+
   const {
     title,
     content,
@@ -33,8 +45,44 @@ export default function PostCard({ post }: { post: any }) {
 
   const isAuthor = userId === author?._id;
 
+  // Likes
+  const {
+    data: likeData,
+    isLoading: likeLoading,
+    refetch: refetchLikes,
+  } = useFetchLikeCountQuery(postId);
+  const [toggleLike, { isLoading: liking }] = useToggleLikeMutation();
+
+  // Dislikes
+  const {
+    data: dislikeData,
+    isLoading: dislikeLoading,
+    refetch: refetchDislikes,
+  } = useFetchDislikeCountQuery(postId);
+  const [toggleDislike, { isLoading: disliking }] = useToggleDislikeMutation();
+
+  const handleLike = async () => {
+    try {
+      await toggleLike({ userId, postId }).unwrap();
+      refetchLikes();
+      refetchDislikes();
+    } catch (err) {
+      console.error("Error toggling like", err);
+    }
+  };
+
+  const handleDislike = async () => {
+    try {
+      await toggleDislike({ userId, postId }).unwrap();
+      refetchDislikes();
+      refetchLikes();
+    } catch (err) {
+      console.error("Error toggling dislike", err);
+    }
+  };
+
   return (
-    <Card variant="outlined" sx={{ width: '100%', maxWidth: 600 }}>
+    <Card variant="outlined" sx={{ width: "100%", maxWidth: 600 }}>
       <CardOverflow>
         <AspectRatio ratio="2">
           <img
@@ -48,7 +96,7 @@ export default function PostCard({ post }: { post: any }) {
       <CardContent>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Typography level="title-md">{title}</Typography>
-          {isAuthor && <PostMenu postId={post._id} />}
+          {isAuthor && <PostMenu postId={postId} />}
         </Box>
         <Typography level="body-sm">{country}</Typography>
         <Typography level="body-sm">
@@ -70,11 +118,29 @@ export default function PostCard({ post }: { post: any }) {
         </Box>
 
         <Box display="flex" justifyContent="space-between" width="100%" gap={1}>
-          <Box display="flex" gap={1}>
-            <ThumbUp sx={{ cursor: "pointer" }} />
-            <ThumbDown sx={{ cursor: "pointer" }} />
+          <Box display="flex" gap={2}>
+            <Box display="flex" alignItems="center" gap={0.5}>
+              <ThumbUp
+                sx={{ cursor: "pointer", color: liking ? "grey" : "primary.main" }}
+                onClick={handleLike}
+              />
+              <Typography level="body-xs">
+                {likeLoading ? "..." : likeData?.likeCount ?? 0}
+              </Typography>
+            </Box>
+
+            <Box display="flex" alignItems="center" gap={0.5}>
+              <ThumbDown
+                sx={{ cursor: "pointer", color: disliking ? "grey" : "error.main" }}
+                onClick={handleDislike}
+              />
+              <Typography level="body-xs">
+                {dislikeLoading ? "..." : dislikeData?.dislikeCount ?? 0}
+              </Typography>
+            </Box>
           </Box>
-          <ChatBubbleOutline sx={{ cursor: "pointer" }} />
+
+          <ChatBubbleOutline sx={{ cursor: "pointer", color: "text.secondary" }} />
         </Box>
       </CardContent>
 

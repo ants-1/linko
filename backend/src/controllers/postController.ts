@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import postModel, { IPost } from "../models/postModel";
 import userModel, { IUser } from "../models/userModel";
+import likeModel, { ILike } from "../models/likeModel";
+import dislikeModel, { IDislike } from "../models/dislikeModel";
 import { uploadImageCloudinary } from "../utils/cloudinary";
 import multer from "multer";
 
@@ -24,13 +26,38 @@ const getAllPosts = async (
       .skip(skip)
       .limit(limit)
       .populate("author", "username avatarUrl")
-      .exec();
+      .lean();
+
+    const postIds = posts.map((post) => post._id);
+
+    const likeCounts = await likeModel.aggregate([
+      { $match: { postIds: { $in: postIds } } },
+      { $group: { _id: "$postId", count: { $sum: 1 } } },
+    ]);
+
+    const dislikeCounts = await dislikeModel.aggregate([
+      { $match: { postId: { $in: postIds } } },
+      { $group: { _id: "$postId", count: { $sum: 1 } } },
+    ]);
+
+    const likeMap = new Map(
+      likeCounts.map((item) => [item._id.toString(), item.count])
+    );
+    const dislikeMap = new Map(
+      dislikeCounts.map((item) => [item._id.toString(), item.count])
+    );
+
+    const formattedPosts = posts.map((post) => ({
+      ...post,
+      likes: likeMap.get(post._id.toString()) || 0,
+      dislikes: dislikeMap.get(post._id.toString()) || 0,
+    }));
 
     return res.status(200).json({
       totalPosts,
       currentPage: page,
       totalPages: Math.ceil(totalPosts / limit),
-      posts,
+      posts: formattedPosts,
     });
   } catch (err) {
     return next(err);
@@ -90,20 +117,42 @@ const getPost = async (
   try {
     const { id } = req.params;
 
-    const post = await postModel.findById(id);
+    const post = await postModel
+      .findById(id)
+      .populate("author", "username avatarUrl")
+      .lean();
 
     if (!post) {
       return res.status(404).json({ error: "Post not found." });
     }
 
-    post.viewCount = Number(post.viewCount ?? 0) + 1;
-    await post.save();
+    await postModel.findByIdAndUpdate(id, { $inc: { viewCount: 1 } });
 
-    return res.status(200).json(post);
+    const [likeCount, dislikeCount] = await Promise.all([
+      likeModel.countDocuments({ postId: id }),
+      dislikeModel.countDocuments({ postId: id }),
+    ]);
+
+    const formattedPost = {
+      ...post,
+      likes: likeCount,
+      dislikes: dislikeCount,
+    };
+
+    return res.status(200).json(formattedPost);
   } catch (err) {
     return next(err);
   }
 };
+
+
+// @desc    Increase view count in post
+// @route   GET /api/v1/posts/:id/views
+const increaseViewCount = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {};
 
 // @desc    Create new blog post
 // @route   POST /api/v1/posts
@@ -112,7 +161,7 @@ const createPost = [
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
       let imageUrl: any = "";
-      console.log('Request body:', req.body);
+      console.log("Request body:", req.body);
 
       if (req.file) {
         try {
@@ -243,6 +292,7 @@ export default {
   getAllPosts,
   getFeedPosts,
   getPost,
+  increaseViewCount,
   createPost,
   editPost,
   deletePost,
