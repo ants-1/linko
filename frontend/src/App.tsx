@@ -12,6 +12,7 @@ import CreatePostForm from "./components/CreatePostForm";
 import EditPostForm from "./components/EditPostForm";
 import MainLayout from "./layouts/MainLayout";
 import AuthLayout from "./layouts/AuthLayout";
+import BlogDetail from "./pages/BlogDetails";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/post/create" element={<CreatePostForm />} />
           <Route path="/posts/:id/edit" element={<EditPostForm />} />
+          <Route path="/posts/:id" element={<BlogDetail />} />
         </Route>
       </Routes >
     </>

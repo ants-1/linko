@@ -14,23 +14,21 @@ import timeAgo from "../utils/dateFormatter";
 import PostMenu from "./PostMenuButton";
 import { Avatar } from "@mui/material";
 import { useSelector } from "react-redux";
-
-// 👍 Like slice
 import {
   useFetchLikeCountQuery,
   useToggleLikeMutation,
 } from "../slices/likeApiSlice";
-
-// 👎 Dislike slice
 import {
   useFetchDislikeCountQuery,
   useToggleDislikeMutation,
 } from "../slices/dislikeApiSlice";
+import { useNavigate } from "react-router-dom";
 
 export default function PostCard({ post }: { post: any }) {
   const { userInfo } = useSelector((state: any) => state.auth);
   const userId = userInfo?.user.userId;
   const postId = post._id;
+  const navigate = useNavigate();
 
   const {
     title,
@@ -45,7 +43,6 @@ export default function PostCard({ post }: { post: any }) {
 
   const isAuthor = userId === author?._id;
 
-  // Likes
   const {
     data: likeData,
     isLoading: likeLoading,
@@ -53,7 +50,6 @@ export default function PostCard({ post }: { post: any }) {
   } = useFetchLikeCountQuery(postId);
   const [toggleLike, { isLoading: liking }] = useToggleLikeMutation();
 
-  // Dislikes
   const {
     data: dislikeData,
     isLoading: dislikeLoading,
@@ -89,6 +85,8 @@ export default function PostCard({ post }: { post: any }) {
             src={imgUrl || "https://placehold.co/600x400/png"}
             alt={title}
             loading="lazy"
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate(`/posts/${postId}`)}
           />
         </AspectRatio>
       </CardOverflow>
@@ -117,7 +115,7 @@ export default function PostCard({ post }: { post: any }) {
           </Typography>
         </Box>
 
-        <Box display="flex" justifyContent="space-between" width="100%" gap={1}>
+        <Box display="flex" justifyContent="space-between" width="100%">
           <Box display="flex" gap={2}>
             <Box display="flex" alignItems="center" gap={0.5}>
               <ThumbUp
@@ -140,7 +138,13 @@ export default function PostCard({ post }: { post: any }) {
             </Box>
           </Box>
 
-          <ChatBubbleOutline sx={{ cursor: "pointer", color: "text.secondary" }} />
+          <Box display="flex" gap={0.5}>
+            <ChatBubbleOutline sx={{ cursor: "pointer", color: "text.secondary" }} />
+
+            <Typography level="body-sm">
+              {post.comments.length ?? 0}
+            </Typography>
+          </Box>
         </Box>
       </CardContent>
 

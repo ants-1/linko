@@ -5,6 +5,7 @@ import likeModel, { ILike } from "../models/likeModel";
 import dislikeModel, { IDislike } from "../models/dislikeModel";
 import { uploadImageCloudinary } from "../utils/cloudinary";
 import multer from "multer";
+import commentModel, { IComment } from "../models/commentModel";
 
 const upload = multer({ dest: "./public/data/uploads/" });
 
@@ -30,27 +31,38 @@ const getAllPosts = async (
 
     const postIds = posts.map((post) => post._id);
 
-    const likeCounts = await likeModel.aggregate([
-      { $match: { postIds: { $in: postIds } } },
-      { $group: { _id: "$postId", count: { $sum: 1 } } },
+    const [likeCounts, dislikeCounts, comments] = await Promise.all([
+      likeModel.aggregate([
+        { $match: { postId: { $in: postIds } } },
+        { $group: { _id: "$postId", count: { $sum: 1 } } },
+      ]),
+      dislikeModel.aggregate([
+        { $match: { postId: { $in: postIds } } },
+        { $group: { _id: "$postId", count: { $sum: 1 } } },
+      ]),
+      commentModel
+        .find({ postId: { $in: postIds } })
+        .populate("userId", "username avatarUrl")
+        .lean(),
     ]);
 
-    const dislikeCounts = await dislikeModel.aggregate([
-      { $match: { postId: { $in: postIds } } },
-      { $group: { _id: "$postId", count: { $sum: 1 } } },
-    ]);
+    const likeMap = new Map(likeCounts.map((item) => [item._id.toString(), item.count]));
+    const dislikeMap = new Map(dislikeCounts.map((item) => [item._id.toString(), item.count]));
 
-    const likeMap = new Map(
-      likeCounts.map((item) => [item._id.toString(), item.count])
-    );
-    const dislikeMap = new Map(
-      dislikeCounts.map((item) => [item._id.toString(), item.count])
-    );
+    const commentMap = new Map<string, IComment[]>();
+    comments.forEach((comment) => {
+      const postId = comment.postId.toString();
+      if (!commentMap.has(postId)) {
+        commentMap.set(postId, []);
+      }
+      commentMap.get(postId)!.push(comment);
+    });
 
     const formattedPosts = posts.map((post) => ({
       ...post,
       likes: likeMap.get(post._id.toString()) || 0,
       dislikes: dislikeMap.get(post._id.toString()) || 0,
+      comments: commentMap.get(post._id.toString()) || [],
     }));
 
     return res.status(200).json({
@@ -128,15 +140,20 @@ const getPost = async (
 
     await postModel.findByIdAndUpdate(id, { $inc: { viewCount: 1 } });
 
-    const [likeCount, dislikeCount] = await Promise.all([
+    const [likeCount, dislikeCount, comments] = await Promise.all([
       likeModel.countDocuments({ postId: id }),
       dislikeModel.countDocuments({ postId: id }),
+      commentModel
+        .find({ postId: id })
+        .populate("userId", "username avatarUrl")
+        .lean(),
     ]);
 
     const formattedPost = {
       ...post,
       likes: likeCount,
       dislikes: dislikeCount,
+      comments: comments,
     };
 
     return res.status(200).json(formattedPost);
@@ -144,6 +161,7 @@ const getPost = async (
     return next(err);
   }
 };
+
 
 
 // @desc    Increase view count in post

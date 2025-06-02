@@ -14,6 +14,7 @@ const getLikeCount = async (
     const { postId } = req.params;
 
     const post = await postModel.findById(postId);
+    
     if (!post) {
       return res.status(404).json({ error: "Post not found." });
     }
