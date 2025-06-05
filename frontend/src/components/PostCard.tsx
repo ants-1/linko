@@ -124,6 +124,8 @@ export default function PostCard({ post }: { post: any }) {
           </Box>
         </Link>
 
+        <Divider sx={{ my: 2 }} />
+
         <Box display="flex" justifyContent="space-between" width="100%">
           <Box display="flex" gap={2}>
             <Box display="flex" alignItems="center" gap={0.5}>

@@ -11,9 +11,22 @@ export const postApiSlice = apiSlice.injectEndpoints({
     }),
 
     fetchFeedPosts: builder.query({
-      query: ({ page = 1, limit = 10 }: { page?: number; limit?: number }) => ({
-        url: `${POST_URL}/feeds?page=${page}&limit=${limit}`,
+      query: ({
+        page = 1,
+        limit = 10,
+        userId,
+        token,
+      }: {
+        page?: number;
+        limit?: number;
+        userId: string;
+        token: string;
+      }) => ({
+        url: `${POST_URL}/users/${userId}/feeds?page=${page}&limit=${limit}`,
         method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }),
     }),
 

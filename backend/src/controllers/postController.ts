@@ -80,17 +80,18 @@ const getAllPosts = async (
   }
 };
 
-// @desc    Get all posts of following users
-// @route   GET /api/v1/posts/feeds
+// @desc    Get all posts of following users (feed)
+// @route   GET /api/v1/posts/users/:id/feeds
 const getFeedPosts = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<any> => {
   try {
-    const { userId } = req.body;
+    const { userId } = req.params;
 
     const user: IUser | null = await userModel.findById(userId).exec();
+    
     if (!user) {
       return res.status(404).json({ error: `User not found.` });
     }
@@ -109,14 +110,54 @@ const getFeedPosts = async (
       .find({ author: { $in: followingIds } })
       .skip(skip)
       .limit(limit)
-      .populate("author", "username")
-      .exec();
+      .populate("author", "username avatarUrl")
+      .lean();
+
+    const postIds = posts.map((post) => post._id);
+
+    const [likeCounts, dislikeCounts, comments] = await Promise.all([
+      likeModel.aggregate([
+        { $match: { postId: { $in: postIds } } },
+        { $group: { _id: "$postId", count: { $sum: 1 } } },
+      ]),
+      dislikeModel.aggregate([
+        { $match: { postId: { $in: postIds } } },
+        { $group: { _id: "$postId", count: { $sum: 1 } } },
+      ]),
+      commentModel
+        .find({ postId: { $in: postIds } })
+        .populate("userId", "username avatarUrl")
+        .lean(),
+    ]);
+
+    const likeMap = new Map(
+      likeCounts.map((item) => [item._id.toString(), item.count])
+    );
+    const dislikeMap = new Map(
+      dislikeCounts.map((item) => [item._id.toString(), item.count])
+    );
+
+    const commentMap = new Map<string, IComment[]>();
+    comments.forEach((comment) => {
+      const postId = comment.postId.toString();
+      if (!commentMap.has(postId)) {
+        commentMap.set(postId, []);
+      }
+      commentMap.get(postId)!.push(comment);
+    });
+
+    const formattedPosts = posts.map((post) => ({
+      ...post,
+      likes: likeMap.get(post._id.toString()) || 0,
+      dislikes: dislikeMap.get(post._id.toString()) || 0,
+      comments: commentMap.get(post._id.toString()) || [],
+    }));
 
     return res.status(200).json({
       totalPosts,
       currentPage: page,
       totalPages: Math.ceil(totalPosts / limit),
-      posts,
+      posts: formattedPosts,
     });
   } catch (err) {
     return next(err);
