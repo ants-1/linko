@@ -46,8 +46,12 @@ const getAllPosts = async (
         .lean(),
     ]);
 
-    const likeMap = new Map(likeCounts.map((item) => [item._id.toString(), item.count]));
-    const dislikeMap = new Map(dislikeCounts.map((item) => [item._id.toString(), item.count]));
+    const likeMap = new Map(
+      likeCounts.map((item) => [item._id.toString(), item.count])
+    );
+    const dislikeMap = new Map(
+      dislikeCounts.map((item) => [item._id.toString(), item.count])
+    );
 
     const commentMap = new Map<string, IComment[]>();
     comments.forEach((comment) => {
@@ -138,8 +142,6 @@ const getPost = async (
       return res.status(404).json({ error: "Post not found." });
     }
 
-    await postModel.findByIdAndUpdate(id, { $inc: { viewCount: 1 } });
-
     const [likeCount, dislikeCount, comments] = await Promise.all([
       likeModel.countDocuments({ postId: id }),
       dislikeModel.countDocuments({ postId: id }),
@@ -162,15 +164,31 @@ const getPost = async (
   }
 };
 
-
-
 // @desc    Increase view count in post
 // @route   GET /api/v1/posts/:id/views
 const increaseViewCount = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<any> => {};
+): Promise<any> => {
+  try {
+    const { id } = req.params;
+
+    const updated = await postModel.findByIdAndUpdate(
+      id,
+      { $inc: { viewCount: 1 } }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ error: "Post not found." });
+    }
+
+    return res.status(200).json({ message: "View count increased." });
+  } catch (err) {
+    return next(err);
+  }
+};
+
 
 // @desc    Create new blog post
 // @route   POST /api/v1/posts

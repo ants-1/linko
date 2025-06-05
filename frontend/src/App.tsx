@@ -30,7 +30,7 @@ function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/feed" element={<Feed />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:id" element={<Profile />} />
           <Route path="/post/create" element={<CreatePostForm />} />
           <Route path="/posts/:id/edit" element={<EditPostForm />} />
           <Route path="/posts/:id" element={<BlogDetail />} />

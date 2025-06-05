@@ -18,8 +18,15 @@ export const postApiSlice = apiSlice.injectEndpoints({
     }),
 
     fetchPost: builder.query({
-      query: ({ id }: { id: string; }) => ({
+      query: ({ id }: { id: string }) => ({
         url: `${POST_URL}/${id}`,
+        method: "GET",
+      }),
+    }),
+
+    increaseViewCount: builder.mutation({
+      query: ({ id }: { id: string }) => ({
+        url: `${POST_URL}/${id}/views`,
         method: "GET",
       }),
     }),
@@ -70,4 +77,5 @@ export const {
   useCreatePostMutation,
   useEditPostMutation,
   useDeletePostMutation,
+  useIncreaseViewCountMutation,
 } = postApiSlice;

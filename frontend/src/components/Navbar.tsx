@@ -1,9 +1,8 @@
 import { useState, type MouseEvent } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useLogoutMutation } from "../slices/userApiSlice";
 import { logout } from "../slices/authSlice";
-import { useSelector } from "react-redux";
 
 import {
   AppBar,
@@ -17,6 +16,12 @@ import {
   Avatar,
   Button,
   Tooltip,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Divider,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 
@@ -27,7 +32,7 @@ export default function Navbar() {
   const { userInfo } = useSelector((state: any) => state.auth);
   const avatarUrl = userInfo?.user?.avatarUrl || "/default-avatar.png";
   const username = userInfo?.user?.username || "User";
-  console.log(userInfo);
+  const userId = userInfo?.user?._id || userInfo?.user?.userId;
 
   const pages = [
     { name: "Home", path: "/home" },
@@ -36,12 +41,16 @@ export default function Navbar() {
     { name: "Chats", path: "/chat" },
   ];
   const settings = [
-    { name: "Profile", path: "/profile" },
+    { name: "Profile", path: `/profile/${userId}` },
     { name: "Logout", path: "/" },
   ];
 
   const [logoutApi] = useLogoutMutation();
-  const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+
+  // Drawer state
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // User menu state
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
   const handleLogout = async () => {
@@ -54,32 +63,38 @@ export default function Navbar() {
     }
   };
 
-  const handleOpenNavMenu = (e: MouseEvent<HTMLElement>) => {
-    setAnchorElNav(e.currentTarget);
+  // Drawer open/close handlers
+  const toggleDrawer = (open: boolean) => () => {
+    setDrawerOpen(open);
   };
 
+  // User menu handlers
   const handleOpenUserMenu = (e: MouseEvent<HTMLElement>) => {
     setAnchorElUser(e.currentTarget);
   };
-
-  const handleCloseNavMenu = (path?: string) => {
-    setAnchorElNav(null);
-    if (path) navigate(path);
-  };
-
-  const handleCloseUserMenu = (setting: string) => {
+  const handleCloseUserMenu = (settingName: string) => {
     setAnchorElUser(null);
-    if (setting === "Logout") {
+    const selected = settings.find((s) => s.name === settingName);
+    if (!selected) return;
+
+    if (selected.name === "Logout") {
       handleLogout();
     } else {
-      navigate("/profile");
+      navigate(selected.path);
     }
+  };
+
+  // Navigate then close drawer
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    setDrawerOpen(false);
   };
 
   return (
     <AppBar position="sticky">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
+          {/* Logo - desktop */}
           <Box
             component="img"
             src="/linko-logo.png"
@@ -87,34 +102,93 @@ export default function Navbar() {
             sx={{ height: 60, display: { xs: "none", md: "flex" }, mr: 1 }}
           />
 
-          {/* Mobile Menu Icon */}
+          {/* Hamburger menu - only on xs */}
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
-              onClick={handleOpenNavMenu}
+              onClick={toggleDrawer(true)}
               color="inherit"
+              aria-label="open drawer"
             >
               <MenuIcon />
             </IconButton>
-            <Menu
-              anchorEl={anchorElNav}
-              open={Boolean(anchorElNav)}
-              onClose={() => handleCloseNavMenu()}
-              anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-              transformOrigin={{ vertical: "top", horizontal: "left" }}
-              sx={{ display: { xs: "block", md: "none" } }}
+
+            <Drawer
+              anchor="left"
+              open={drawerOpen}
+              onClose={toggleDrawer(false)}
+              ModalProps={{ keepMounted: true }}
             >
-              {pages
-                .filter(page => !["Chats", "Feed"].includes(page.name) || userInfo)
-                .map((page) => (
-                  <MenuItem
-                    key={page.name}
-                    onClick={() => handleCloseNavMenu(page.path)}
-                  >
-                    <Typography textAlign="center">{page.name}</Typography>
-                  </MenuItem>
-                ))}
-            </Menu>
+              <Box
+                sx={{ width: 250 }}
+                role="presentation"
+                onClick={toggleDrawer(false)}
+                onKeyDown={toggleDrawer(false)}
+              >
+                <List>
+                  {pages
+                    .filter(
+                      (page) =>
+                        !["Chats", "Feed"].includes(page.name) || userInfo
+                    )
+                    .map((page) => (
+                      <ListItem key={page.name} disablePadding>
+                        <ListItemButton
+                          onClick={() => handleNavigate(page.path)}
+                        >
+                          <ListItemText primary={page.name} />
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+                </List>
+
+                <Divider />
+
+                {userInfo ? (
+                  <List>
+                    {settings.map((setting) => (
+                      <ListItem key={setting.name} disablePadding>
+                        <ListItemButton
+                          onClick={() => {
+                            if (setting.name === "Logout") {
+                              setDrawerOpen(false);
+                              handleLogout();
+                            } else {
+                              handleNavigate(setting.path);
+                            }
+                          }}
+                        >
+                          <ListItemText primary={setting.name} />
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+                  </List>
+                ) : (
+                  <List>
+                    <ListItem disablePadding>
+                      <ListItemButton
+                        onClick={() => {
+                          setDrawerOpen(false);
+                          navigate("/sign-up");
+                        }}
+                      >
+                        <ListItemText primary="Sign Up" />
+                      </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding>
+                      <ListItemButton
+                        onClick={() => {
+                          setDrawerOpen(false);
+                          navigate("/");
+                        }}
+                      >
+                        <ListItemText primary="Login" />
+                      </ListItemButton>
+                    </ListItem>
+                  </List>
+                )}
+              </Box>
+            </Drawer>
           </Box>
 
           {/* Logo on small screens */}
@@ -141,14 +215,14 @@ export default function Navbar() {
             Linko
           </Typography>
 
-          {/* Desktop Menu */}
+          {/* Desktop menu buttons */}
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages
-              .filter(page => !["Chats", "Feed"].includes(page.name) || userInfo)
+              .filter((page) => !["Chats", "Feed"].includes(page.name) || userInfo)
               .map((page) => (
                 <Button
                   key={page.name}
-                  onClick={() => handleCloseNavMenu(page.path)}
+                  onClick={() => navigate(page.path)}
                   sx={{ my: 2, color: "white", display: "block" }}
                 >
                   {page.name}
@@ -156,14 +230,17 @@ export default function Navbar() {
               ))}
           </Box>
 
-          {/* User Settings */}
+          {/* User settings */}
           <Box sx={{ flexGrow: 0 }}>
             {userInfo ? (
-              // Logged-in user: show avatar and settings
               <>
                 <Tooltip title="Open settings">
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar alt={username} src={avatarUrl} sx={{ backgroundColor: "white", color: "black" }} />
+                    <Avatar
+                      alt={username}
+                      src={avatarUrl}
+                      sx={{ backgroundColor: "white", color: "black" }}
+                    />
                   </IconButton>
                 </Tooltip>
 
@@ -186,7 +263,6 @@ export default function Navbar() {
                 </Menu>
               </>
             ) : (
-              // Not logged in: show Login and Sign Up buttons
               <>
                 <Button color="inherit" onClick={() => navigate("/sign-up")}>
                   Sign Up

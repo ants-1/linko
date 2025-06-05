@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.get("/", postController.getAllPosts);
 router.get("/:id", postController.getPost);
+router.get("/:id/views", postController.increaseViewCount);
 router.get("/feeds", validateToken, postController.getFeedPosts);
 router.post("/", validateToken, ...postController.createPost);
 router.put("/:id", validateToken, ...postController.editPost);

@@ -22,7 +22,9 @@ import {
   useFetchDislikeCountQuery,
   useToggleDislikeMutation,
 } from "../slices/dislikeApiSlice";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useIncreaseViewCountMutation } from "../slices/postApiSlice";
+
 
 export default function PostCard({ post }: { post: any }) {
   const { userInfo } = useSelector((state: any) => state.auth);
@@ -57,6 +59,8 @@ export default function PostCard({ post }: { post: any }) {
   } = useFetchDislikeCountQuery(postId);
   const [toggleDislike, { isLoading: disliking }] = useToggleDislikeMutation();
 
+  const [increaseView] = useIncreaseViewCountMutation();
+
   const handleLike = async () => {
     try {
       await toggleLike({ userId, postId }).unwrap();
@@ -86,7 +90,10 @@ export default function PostCard({ post }: { post: any }) {
             alt={title}
             loading="lazy"
             style={{ cursor: "pointer" }}
-            onClick={() => navigate(`/posts/${postId}`)}
+            onClick={async () => {
+              await increaseView({ id: postId });
+              navigate(`/posts/${postId}`)
+            }}
           />
         </AspectRatio>
       </CardOverflow>
@@ -102,18 +109,20 @@ export default function PostCard({ post }: { post: any }) {
         </Typography>
         <Typography level="body-sm">{content}</Typography>
 
-        <Box sx={{ display: "flex", alignItems: "end", gap: 1, my: 1 }}>
-          <Avatar
-            alt={author?.username}
-            src={author?.avatarUrl || undefined}
-            sx={{ backgroundColor: "light-grey", color: "black" }}
-          >
-            {author?.username?.charAt(0).toUpperCase() || "U"}
-          </Avatar>
-          <Typography level="body-sm" sx={{ mb: 1 }}>
-            {author?.username ?? "Unknown"}
-          </Typography>
-        </Box>
+        <Link to={`/profile/${author?._id}`} style={{ textDecoration: "none", color: "inherit" }}>
+          <Box sx={{ display: "flex", alignItems: "end", gap: 1, my: 1 }}>
+            <Avatar
+              alt={author?.username}
+              src={author?.avatarUrl || undefined}
+              sx={{ backgroundColor: "light-grey", color: "black" }}
+            >
+              {author?.username?.charAt(0).toUpperCase() || "U"}
+            </Avatar>
+            <Typography level="body-sm" sx={{ mb: 1 }}>
+              {author?.username ?? "Unknown"}
+            </Typography>
+          </Box>
+        </Link>
 
         <Box display="flex" justifyContent="space-between" width="100%">
           <Box display="flex" gap={2}>

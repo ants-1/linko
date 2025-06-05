@@ -84,7 +84,7 @@ export default function BlogDetail() {
   } = post;
 
   return (
-    <>
+    <Box sx={{ p: 3 }}>
       <Card variant="outlined" sx={{ width: "100%", maxWidth: 800, margin: "auto", mt: 4 }}>
         <CardOverflow>
           <AspectRatio ratio="2">
@@ -185,6 +185,6 @@ export default function BlogDetail() {
           <Typography>No comments yet.</Typography>
         )}
       </Box>
-    </>
+    </Box>
   );
 }
