@@ -5,5 +5,5 @@ const baseQuery = fetchBaseQuery({ baseUrl: "http://localhost:5001" });
 export const apiSlice = createApi({
   baseQuery,
   tagTypes: ["User", "Post"],
-  endpoints: (builder) => ({}),
+  endpoints: (_builder) => ({}),
 });
