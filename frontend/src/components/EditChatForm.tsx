@@ -24,7 +24,7 @@ export default function EditChatForm() {
   console.log('chatid', chatId)
   const navigate = useNavigate();
   const { userInfo } = useSelector((state: any) => state.auth);
-  const userId = userInfo?.user.userId || userInfo?._id;
+  const userId = userInfo?.user.userId || userInfo?.user?._id;
   const token = userInfo?.token;
 
   const [name, setName] = useState("");
@@ -39,18 +39,18 @@ export default function EditChatForm() {
 
   const [editChat, { isLoading: isSubmitting }] = useEditChatMutation();
 
-useEffect(() => {
-  if (chatData) {
-    setName(chatData.name);
-    if (typeof chatData.countries === "string") {
-      setSelectedCountries(chatData.countries.split(","));
-    } else if (Array.isArray(chatData.countries)) {
-      setSelectedCountries(chatData.countries);
-    } else {
-      setSelectedCountries([]);
+  useEffect(() => {
+    if (chatData) {
+      setName(chatData.name);
+      if (typeof chatData.countries === "string") {
+        setSelectedCountries(chatData.countries.split(","));
+      } else if (Array.isArray(chatData.countries)) {
+        setSelectedCountries(chatData.countries);
+      } else {
+        setSelectedCountries([]);
+      }
     }
-  }
-}, [chatData]);
+  }, [chatData]);
 
 
   const handleCountryChange = (event: any) => {
@@ -80,7 +80,10 @@ useEffect(() => {
     const formData = new FormData();
     formData.append("name", name);
     formData.append("hostId", userId);
-    formData.append("countries", selectedCountries.join(","));
+    selectedCountries.forEach((country) => {
+      formData.append("countries", country);
+    });
+
     if (imageFile) {
       formData.append("imgUrl", imageFile);
     }
@@ -89,7 +92,7 @@ useEffect(() => {
       await editChat({ chatId, formData, token }).unwrap();
       setMessage("Chat updated successfully!");
       navigate("/chat");
-      window.location.reload(); 
+      window.location.reload();
     } catch (error) {
       setMessage("Failed to update chat.");
       console.error("Edit chat error:", error);
@@ -115,7 +118,7 @@ useEffect(() => {
 
   return (
     <Box sx={{ maxWidth: 600, width: "100%", mx: "auto", mt: 4, p: 3 }}>
-      <Typography variant="h5" sx={{ mb: 2}} gutterBottom>Edit Chat</Typography>
+      <Typography variant="h5" sx={{ mb: 2 }} gutterBottom>Edit Chat</Typography>
       <form onSubmit={handleSubmit}>
         <TextField
           fullWidth

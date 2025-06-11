@@ -171,7 +171,7 @@ export default function BlogDetail() {
       </Box>
 
       {/* Comment Section */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 5 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', my: 5 }}>
         <Typography level="h3" mb={2}>Comments</Typography>
         {comments?.length > 0 ? (
           <CommentList

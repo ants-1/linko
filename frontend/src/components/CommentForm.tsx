@@ -13,7 +13,7 @@ export default function CommentForm({ postId, refetchComments }: CommentFormProp
   const [addComment, { isLoading }] = useAddCommentMutation();
 
   const { userInfo } = useSelector((state: any) => state.auth);
-  const userId = userInfo?.user?.userId;
+  const userId = userInfo?.user?.userId || userInfo?.user?._id ;
   const token = userInfo?.token;
 
   if (!userId || !token) {
@@ -40,7 +40,7 @@ export default function CommentForm({ postId, refetchComments }: CommentFormProp
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2, width: "100%", maxWidth: 800 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4, width: "100%", maxWidth: 800 }}>
       <TextField
         fullWidth
         multiline

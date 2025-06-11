@@ -9,14 +9,14 @@ import PostCard from "./PostCard";
 import { useFetchFeedPostsQuery } from "../slices/postApiSlice";
 import { useSelector } from "react-redux";
 
-export default function PostList() {
+export default function PostFeedList({ searchQuery }: { searchQuery: string }) {
   const [page, setPage] = useState(1);
   const limit = 10;
   const { userInfo } = useSelector((state: any) => state.auth);
   const userId = userInfo?.user?._id || userInfo?.user?.userId;
   const token = userInfo?.token;
 
-  const { data, isLoading, error } = useFetchFeedPostsQuery({ page, limit, userId, token });
+  const { data, isLoading, error } = useFetchFeedPostsQuery({ page, limit, userId, token, search: searchQuery });
 
   const handlePageChange = (_: any, newPage: number) => {
     setPage(newPage);

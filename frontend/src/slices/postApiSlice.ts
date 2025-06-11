@@ -4,8 +4,8 @@ const POST_URL = "/api/v1/posts";
 export const postApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     fetchPosts: builder.query({
-      query: ({ page = 1, limit = 10 }: { page?: number; limit?: number }) => ({
-        url: `${POST_URL}?page=${page}&limit=${limit}`,
+      query: ({ page = 1, limit = 10, search = "" }: { page?: number; limit?: number, search: string }) => ({
+        url: `${POST_URL}?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`,
         method: "GET",
       }),
     }),
@@ -16,13 +16,15 @@ export const postApiSlice = apiSlice.injectEndpoints({
         limit = 10,
         userId,
         token,
+        search = "",
       }: {
         page?: number;
         limit?: number;
         userId: string;
         token: string;
+        search: string;
       }) => ({
-        url: `${POST_URL}/users/${userId}/feeds?page=${page}&limit=${limit}`,
+        url: `${POST_URL}/users/${userId}/feeds?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`,
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

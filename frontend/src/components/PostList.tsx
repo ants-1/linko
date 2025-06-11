@@ -8,11 +8,11 @@ import { Pagination } from "@mui/material";
 import PostCard from "./PostCard";
 import { useFetchPostsQuery } from "../slices/postApiSlice";
 
-export default function PostList() {
+export default function PostList({ searchQuery }: { searchQuery: string }) {
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  const { data, isLoading, error } = useFetchPostsQuery({ page, limit });
+  const { data, isLoading, error } = useFetchPostsQuery({ page, limit, search: searchQuery });
 
   const handlePageChange = (_: any, newPage: number) => {
     setPage(newPage);
@@ -22,7 +22,9 @@ export default function PostList() {
   if (error) return <Typography color="danger">Failed to load posts.</Typography>;
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" gap={3} p={2}>
+    <Box display="flex" flexDirection="column"
+      width="100%"
+      alignItems="center" gap={3} p={2}>
       <Box
         display="flex"
         flexWrap="wrap"

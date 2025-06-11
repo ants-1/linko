@@ -1,8 +1,11 @@
-import { Box } from "@mui/material";
-import SearchBar from "../components/SearchBar";
+import { useState } from "react";
+import { Box, Typography } from "@mui/material";
 import PostFeedList from "../components/PostFeedList";
+import SearchBar from "../components/SearchBar";
 
 export default function Feed() {
+  const [query, setQuery] = useState("");
+
   return (
     <Box
       sx={{
@@ -13,8 +16,9 @@ export default function Feed() {
         alignItems: "center",
       }}
     >
-      <SearchBar onSearch={(query) => console.log("Searching for:", query)} />
-      <PostFeedList />
+      <Typography variant="h3" fontWeight="semibold" sx={{ mb: 2}}>Feed</Typography>
+      <SearchBar onSearch={(q) => setQuery(q)} />
+      <PostFeedList searchQuery={query} />
     </Box>
   )
 }

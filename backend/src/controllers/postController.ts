@@ -17,13 +17,18 @@ const getAllPosts = async (
   next: NextFunction
 ): Promise<any> => {
   try {
+    const { search } = req.query;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
 
-    const totalPosts = await postModel.countDocuments();
+    const searchFilter = search
+      ? { title: { $regex: search as string, $options: "i" } }
+      : {};
+
+    const totalPosts = await postModel.countDocuments(searchFilter);
     const posts = await postModel
-      .find()
+      .find(searchFilter)
       .skip(skip)
       .limit(limit)
       .populate("author", "username avatarUrl")
@@ -89,9 +94,10 @@ const getFeedPosts = async (
 ): Promise<any> => {
   try {
     const { userId } = req.params;
+    const { search } = req.query;
 
     const user: IUser | null = await userModel.findById(userId).exec();
-    
+
     if (!user) {
       return res.status(404).json({ error: `User not found.` });
     }
@@ -102,12 +108,28 @@ const getFeedPosts = async (
 
     const followingIds = user.following || [];
 
-    const totalPosts = await postModel.countDocuments({
+    if (!followingIds.length) {
+      return res.status(200).json({
+        totalPosts: 0,
+        currentPage: page,
+        totalPages: 0,
+        posts: [],
+      });
+    }
+
+    // Compose proper query
+    const query: any = {
       author: { $in: followingIds },
-    });
+    };
+
+    if (search) {
+      query.title = { $regex: search as string, $options: "i" };
+    }
+
+    const totalPosts = await postModel.countDocuments(query);
 
     const posts = await postModel
-      .find({ author: { $in: followingIds } })
+      .find(query)
       .skip(skip)
       .limit(limit)
       .populate("author", "username avatarUrl")
@@ -164,6 +186,7 @@ const getFeedPosts = async (
   }
 };
 
+
 // @desc    Get single post
 // @route   GET /api/v1/posts/:id
 const getPost = async (
@@ -215,10 +238,9 @@ const increaseViewCount = async (
   try {
     const { id } = req.params;
 
-    const updated = await postModel.findByIdAndUpdate(
-      id,
-      { $inc: { viewCount: 1 } }
-    );
+    const updated = await postModel.findByIdAndUpdate(id, {
+      $inc: { viewCount: 1 },
+    });
 
     if (!updated) {
       return res.status(404).json({ error: "Post not found." });
@@ -229,7 +251,6 @@ const increaseViewCount = async (
     return next(err);
   }
 };
-
 
 // @desc    Create new blog post
 // @route   POST /api/v1/posts
@@ -295,7 +316,7 @@ const editPost = [
       }
 
       const existingPost = await postModel.findById(id);
-      
+
       if (!existingPost) {
         return res.status(404).json({ error: "Post not found." });
       }

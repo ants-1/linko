@@ -46,7 +46,7 @@ export default function CreateChatForm() {
       !selectedCountries.includes(selectedCountry)
     ) {
       setSelectedCountries((prev) => [...prev, selectedCountry]);
-      setSelectedCountry(""); 
+      setSelectedCountry("");
     }
   };
 
@@ -72,8 +72,10 @@ export default function CreateChatForm() {
     if (imageFile) {
       formData.append("imgUrl", imageFile);
     }
-    // Send countries as comma separated string or JSON stringified array if backend supports
-    formData.append("countries", selectedCountries.join(","));
+    selectedCountries.forEach((country) => {
+      formData.append("countries", country);
+    });
+
 
     try {
       await createChat({ formData, token }).unwrap();
@@ -102,7 +104,7 @@ export default function CreateChatForm() {
 
   return (
     <Box sx={{ maxWidth: 600, width: '100%', mx: "auto", mt: 4, p: 3 }}>
-      <Typography variant="h5" sx={{ mb: 2}} gutterBottom>Create a New Chat</Typography>
+      <Typography variant="h5" sx={{ mb: 2 }} gutterBottom>Create a New Chat</Typography>
       <form onSubmit={handleSubmit}>
         <TextField
           fullWidth

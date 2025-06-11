@@ -21,9 +21,16 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  ListItemIcon,
   Divider,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import HomeIcon from '@mui/icons-material/Home';
+import DynamicFeedIcon from '@mui/icons-material/DynamicFeed';
+import ViewModuleIcon from '@mui/icons-material/ViewModule';
+import ChatIcon from '@mui/icons-material/Chat';
+import PersonIcon from '@mui/icons-material/Person';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 export default function Navbar() {
   const dispatch = useDispatch();
@@ -35,14 +42,15 @@ export default function Navbar() {
   const userId = userInfo?.user?._id || userInfo?.user?.userId;
 
   const pages = [
-    { name: "Home", path: "/home" },
-    { name: "Feed", path: "/feed" },
-    { name: "Blog", path: "/blog" },
-    { name: "Chats", path: "/chat" },
+    { name: "Home", path: "/home", icon: <HomeIcon /> },
+    { name: "Feed", path: "/feed", icon: <DynamicFeedIcon /> },
+    { name: "Blog", path: "/blog", icon: <ViewModuleIcon /> },
+    { name: "Chats", path: "/chat", icon: <ChatIcon /> },
   ];
+
   const settings = [
-    { name: "Profile", path: `/profile/${userId}` },
-    { name: "Logout", path: "/" },
+    { name: "Profile", path: `/profile/${userId}`, icon: <PersonIcon /> },
+    { name: "Logout", path: "/", icon: <LogoutIcon /> },
   ];
 
   const [logoutApi] = useLogoutMutation();
@@ -136,6 +144,7 @@ export default function Navbar() {
                         <ListItemButton
                           onClick={() => handleNavigate(page.path)}
                         >
+                          <ListItemIcon>{page.icon}</ListItemIcon>
                           <ListItemText primary={page.name} />
                         </ListItemButton>
                       </ListItem>
@@ -158,6 +167,7 @@ export default function Navbar() {
                             }
                           }}
                         >
+                          <ListItemIcon>{setting.icon}</ListItemIcon>
                           <ListItemText primary={setting.name} />
                         </ListItemButton>
                       </ListItem>
