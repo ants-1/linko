@@ -20,17 +20,19 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   };
 
   return (
-    <Input
-      placeholder="Search posts..."
-      value={query}
-      onChange={(e) => setQuery(e.target.value)}
-      onKeyDown={handleKeyDown}
-      endDecorator={
-        <IconButton onClick={handleSearch}>
-          <SearchIcon />
-        </IconButton>
-      }
-      sx={{ width: 400, marginBottom: "20px" }}
-    />
+    <>
+      <Input
+        placeholder="Search posts..."
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={handleKeyDown}
+        endDecorator={
+          <IconButton onClick={handleSearch}>
+            <SearchIcon />
+          </IconButton>
+        }
+        sx={{ width: 400, marginBottom: "20px" }}
+      />
+    </>
   );
 }

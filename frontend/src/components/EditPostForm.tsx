@@ -88,7 +88,7 @@ const EditPostForm: React.FC = () => {
 
       await editPost({ id, formData, token }).unwrap();
       setMessage("Post updated successfully!");
-      navigate("/home");
+      navigate("/");
       window.location.reload(); 
     } catch (err) {
       setMessage("Failed to update post.");

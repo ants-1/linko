@@ -85,7 +85,7 @@ const CreatePost: React.FC = () => {
       setVisitDate("");
       setCountryDetails(null);
       setImageFile(null);
-      navigate("/home");
+      navigate("/");
     } catch (err) {
       setMessage("Failed to create post.");
     }

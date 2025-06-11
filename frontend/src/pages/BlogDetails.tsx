@@ -30,7 +30,7 @@ import CommentForm from "../components/CommentForm";
 export default function BlogDetail() {
   const { id = "" } = useParams();
   const { userInfo } = useSelector((state: any) => state.auth);
-  const userId = userInfo?.user?.userId;
+  const userId = userInfo?.user?.userId || userInfo?.user?._id;
 
   const { data: post, isLoading, error, refetch: refetchPost, } = useFetchPostQuery({ id });
 

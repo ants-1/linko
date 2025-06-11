@@ -19,7 +19,7 @@ export default function GoogleCallback() {
 
     if (token && username && email) {
       dispatch(setCredentials({ token, user: { userId, username, email, avatarUrl } }));
-      navigate("/home");
+      navigate("/");
     } else {
       navigate("/login");
     }

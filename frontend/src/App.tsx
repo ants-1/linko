@@ -23,13 +23,13 @@ function App() {
       <CssBaseline />
       <Routes>
         <Route element={<AuthLayout />}>
-          <Route path="/" element={<Login />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/google/callback" element={<GoogleCallback />} />
         </Route>
 
         <Route element={<MainLayout />}>
-          <Route path="/home" element={<Home />} />
+          <Route path="/" element={<Home />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/feed" element={<Feed />} />

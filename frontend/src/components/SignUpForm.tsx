@@ -30,7 +30,7 @@ export default function SignUpForm() {
 
   useEffect(() => {
     if (userInfo) {
-      navigate("/home");
+      navigate("/");
     }
   }, [navigate, userInfo]);
 
@@ -56,7 +56,7 @@ export default function SignUpForm() {
     try {
       const res = await signUp({ username, email, password }).unwrap();
       dispatch(setCredentials(res));
-      navigate("/home");
+      navigate("/");
     } catch (err: any) {
       setError(err?.data?.message || "Sign up failed");
     }
@@ -142,7 +142,7 @@ export default function SignUpForm() {
           <Divider sx={{ mt: 3 }}></Divider>
 
           <Typography sx={{ mt: 3, textAlign: "center" }}>
-            Already have an account? <Link to="/">Login!</Link>
+            Already have an account? <Link to="/login">Login!</Link>
           </Typography>
         </Box>
       </Card>

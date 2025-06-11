@@ -29,7 +29,7 @@ export default function LoginForm() {
 
   useEffect(() => {
     if (userInfo) {
-      navigate("/home");
+      navigate("/");
     }
   }, [navigate, userInfo]);
 
@@ -47,7 +47,7 @@ export default function LoginForm() {
         email: decoded.email,
       };
       dispatch(setCredentials(user));
-      navigate("/home");
+      navigate("/");
     }
   }, [dispatch, navigate]);
 
@@ -57,7 +57,7 @@ export default function LoginForm() {
     try {
       const res = await login({ email, password }).unwrap();
       dispatch(setCredentials(res));
-      navigate("/home");
+      navigate("/");
     } catch (err: any) {
       setError(err?.data?.error || "Invalid username or password");
     }

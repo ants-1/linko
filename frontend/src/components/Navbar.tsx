@@ -42,7 +42,7 @@ export default function Navbar() {
   const userId = userInfo?.user?._id || userInfo?.user?.userId;
 
   const pages = [
-    { name: "Home", path: "/home", icon: <HomeIcon /> },
+    { name: "Home", path: "/", icon: <HomeIcon /> },
     { name: "Feed", path: "/feed", icon: <DynamicFeedIcon /> },
     { name: "Blog", path: "/blog", icon: <ViewModuleIcon /> },
     { name: "Chats", path: "/chat", icon: <ChatIcon /> },
@@ -189,7 +189,7 @@ export default function Navbar() {
                       <ListItemButton
                         onClick={() => {
                           setDrawerOpen(false);
-                          navigate("/");
+                          navigate("/login");
                         }}
                       >
                         <ListItemText primary="Login" />
@@ -277,7 +277,7 @@ export default function Navbar() {
                 <Button color="inherit" onClick={() => navigate("/sign-up")}>
                   Sign Up
                 </Button>
-                <Button color="inherit" onClick={() => navigate("/")}>
+                <Button color="inherit" onClick={() => navigate("/login")}>
                   Login
                 </Button>
               </>
