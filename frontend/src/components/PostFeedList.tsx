@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 
 export default function PostFeedList({ searchQuery }: { searchQuery: string }) {
   const [page, setPage] = useState(1);
-  const limit = 10;
+  const limit = 6;
   const { userInfo } = useSelector((state: any) => state.auth);
   const userId = userInfo?.user?._id || userInfo?.user?.userId;
   const token = userInfo?.token;

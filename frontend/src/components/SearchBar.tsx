@@ -31,7 +31,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
             <SearchIcon />
           </IconButton>
         }
-        sx={{ width: 400, marginBottom: "20px" }}
+        sx={{ width: 400, marginBottom: "20px", height: "40px" }}
       />
     </>
   );

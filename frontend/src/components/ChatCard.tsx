@@ -138,20 +138,26 @@ export default function ChatCard({
             />
           ))}
         </Box>
-
-
         <Button variant="contained" sx={{ mt: 2, mr: 1 }} onClick={() => handleVisitChat(id)}>
           Visit Chat
         </Button>
-        {!isMember ? (
-          <Button variant="outlined" color="primary" sx={{ mt: 2 }} onClick={() => onJoin(id)}>
-            Join Chat
-          </Button>
-        ) : (
-          <Button variant="outlined" disabled={isAuthor} color="secondary" sx={{ mt: 2 }} onClick={() => onLeave(id)}>
-            Leave Chat
-          </Button>
-        )}
+        {currentUserId &&
+          (!isMember ? (
+            <Button variant="outlined" color="primary" sx={{ mt: 2 }} onClick={() => onJoin(id)}>
+              Join Chat
+            </Button>
+          ) : (
+            <Button
+              variant="outlined"
+              disabled={isAuthor}
+              color="secondary"
+              sx={{ mt: 2 }}
+              onClick={() => onLeave(id)}
+            >
+              Leave Chat
+            </Button>
+          ))}
+
       </CardContent>
     </Card>
   );

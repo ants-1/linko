@@ -19,7 +19,7 @@ const getAllPosts = async (
   try {
     const { search } = req.query;
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
+    const limit = parseInt(req.query.limit as string) || 6;
     const skip = (page - 1) * limit;
 
     const searchFilter = search
@@ -103,7 +103,7 @@ const getFeedPosts = async (
     }
 
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
+    const limit = parseInt(req.query.limit as string) || 6;
     const skip = (page - 1) * limit;
 
     const followingIds = user.following || [];

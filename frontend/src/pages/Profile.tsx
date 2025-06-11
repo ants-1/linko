@@ -24,8 +24,9 @@ const FollowButton = ({
 }) => {
   return (
     <Button
-      size="small"
-      variant="contained"
+      size="large"
+      variant="outlined"
+      color={isFollowing ? "secondary" : "primary"}
       onClick={onToggle}
       disabled={disabled}
       sx={{ mt: 1 }}
@@ -49,7 +50,8 @@ const Profile = () => {
 
   const [toggleFollow, { isLoading: followLoading }] = useToggleFollowMutation();
 
-  const isFollowing = followersData?.followers?.some((f: any) => f._id === currentUserId);
+  const isFollowing =
+    (followersData?.followers && followersData.followers.some((f: any) => f._id === currentUserId));
 
   const toggleEditForm = () => setShowEditForm((prev) => !prev);
 
@@ -119,14 +121,19 @@ const Profile = () => {
       {/* Followers List */}
       <Typography variant="h6" mb={1}>Followers</Typography>
       {followersData?.followers?.length > 0 ? (
-        followersData.followers.map((f: any) => (
-          <FollowCard
-            key={f._id}
-            user={f}
-            isFollowing={false}
-            onToggle={refetchFollowers}
-          />
-        ))
+        followersData.followers.map((f: any) => {
+          const followerIsFollowedByCurrentUser = followingData?.following?.some(
+            (followed: any) => followed._id === f._id
+          );
+          return (
+            <FollowCard
+              key={f._id}
+              user={f}
+              isFollowing={!!followerIsFollowedByCurrentUser}
+              onToggle={refetchFollowers}
+            />
+          );
+        })
       ) : (
         <Typography color="text.secondary">No followers yet.</Typography>
       )}

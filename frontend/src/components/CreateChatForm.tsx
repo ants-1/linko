@@ -167,6 +167,7 @@ export default function CreateChatForm() {
         <Button
           type="submit"
           variant="contained"
+          size="large"
           disabled={isSubmitting}
           fullWidth
         >

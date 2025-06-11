@@ -38,7 +38,7 @@ const CreatePost: React.FC = () => {
   const { data, error, isLoading: isCountriesLoading } = useFetchCountriesQuery({});
   const countries = data?.countries || [];
   const { userInfo } = useSelector((state: any) => state.auth);
-  const userId = userInfo?.user.userId;
+  const userId = userInfo?.user.userId || userInfo?.user?._id;
   const token = userInfo?.token;
 
   const [createPost, { isLoading: isSubmitting }] = useCreatePostMutation();

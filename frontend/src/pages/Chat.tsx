@@ -21,7 +21,7 @@ export default function Chat() {
   const userId = userInfo?.user.userId || userInfo?.user?._id;
 
   const { data: chats, error, refetch, isLoading } = useFetchChatsQuery(undefined);
-  const { data: myChats, refetch: myRefetch } = useFetchUserChatsQuery({ userId, token});
+  const { data: myChats, refetch: myRefetch } = useFetchUserChatsQuery({ userId, token });
 
   const handleChange = (_: SyntheticEvent, newValue: string) => {
     setValue(newValue);
@@ -38,10 +38,11 @@ export default function Chat() {
         <Tab value="one" label="All" />
         <Tab value="two" label="My Chats" disabled={!userInfo} />
       </Tabs>
-
-      <Button variant="contained" sx={{ mt: 2 }} onClick={() => navigate("/chat/create")}>
-        Create Chat
-      </Button>
+      {userInfo && (
+        <Button variant="contained" sx={{ mt: 2 }} onClick={() => navigate("/chat/create")}>
+          Create Chat
+        </Button>
+      )}
 
       <Box sx={{ mt: 3 }}>
         {isLoading && <Typography>Loading chats...</Typography>}

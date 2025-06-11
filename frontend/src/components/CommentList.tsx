@@ -34,7 +34,7 @@ export default function CommentList({ comments, userId, token, refetch }: Commen
           postId={comment.postId}
           userId={comment.userId._id}
           token={token}
-          showDelete={comment.userId._id === userId || comment.postAuthor === userId}
+          showDelete={comment.userId._id === userId}
           onDeleted={refetch}
         />
       ))}

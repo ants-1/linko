@@ -25,7 +25,8 @@ export default function FollowCard({ user, isFollowing, onToggle }: FollowCardPr
         targetUserId: user._id,
       }).unwrap();
 
-      if (onToggle) onToggle(); 
+      if (onToggle) onToggle();
+      window.location.reload();
     } catch (err) {
       console.error("Toggle follow error:", err);
     }
