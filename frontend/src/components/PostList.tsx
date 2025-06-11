@@ -28,6 +28,8 @@ export default function PostList() {
         flexWrap="wrap"
         gap={2}
         justifyContent="center"
+        width="100%"
+        maxWidth="900px"
       >
         {data?.posts?.map((post: any) => (
           <PostCard key={post._id} post={post} />

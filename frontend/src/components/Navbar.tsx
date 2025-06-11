@@ -129,7 +129,7 @@ export default function Navbar() {
                   {pages
                     .filter(
                       (page) =>
-                        !["Chats", "Feed"].includes(page.name) || userInfo
+                        !["Feed"].includes(page.name) || userInfo
                     )
                     .map((page) => (
                       <ListItem key={page.name} disablePadding>
@@ -218,7 +218,7 @@ export default function Navbar() {
           {/* Desktop menu buttons */}
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages
-              .filter((page) => !["Chats", "Feed"].includes(page.name) || userInfo)
+              .filter((page) => !["Feed"].includes(page.name) || userInfo)
               .map((page) => (
                 <Button
                   key={page.name}

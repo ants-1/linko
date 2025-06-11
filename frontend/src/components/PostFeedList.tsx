@@ -26,30 +26,29 @@ export default function PostList() {
   if (error) return <Typography color="danger">Failed to load posts.</Typography>;
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" gap={3} p={2}>
+    <Box display="flex" flexDirection="column"
+      width="100%"
+      alignItems="center" gap={3} p={2}>
       <Box
         display="flex"
         flexWrap="wrap"
         gap={2}
         justifyContent="center"
+        width="100%"
+        maxWidth="900px"
       >
         {data?.posts?.map((post: any) => (
           <PostCard key={post._id} post={post} />
         ))}
       </Box>
-      {data.length > 0 ? (
-        <Pagination
-          count={data.totalPages}
-          page={page}
-          onChange={handlePageChange}
-          variant="outlined"
-          color="primary"
-        />
-      ) : (
-        <>
-          <Typography>No posts found.</Typography>
-        </>
-      )}
+
+      <Pagination
+        count={data.totalPages}
+        page={page}
+        onChange={handlePageChange}
+        variant="outlined"
+        color="primary"
+      />
     </Box>
   );
 }

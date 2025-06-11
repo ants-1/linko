@@ -166,7 +166,7 @@ export default function BlogDetail() {
         </CardOverflow>
       </Card>
 
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 5 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
         <CommentForm postId={post._id} refetchComments={refetchPost} />
       </Box>
 

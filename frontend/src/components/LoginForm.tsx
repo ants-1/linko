@@ -118,7 +118,7 @@ export default function LoginForm() {
           >
             {isLoading ? "Logging in..." : "Login"}
           </Button>
-          <Divider sx={{ mt: 3 }} />
+          <Divider sx={{ mt: 3 }}>OR</Divider>
           <Button
             variant="outlined"
             color="primary"
@@ -126,7 +126,7 @@ export default function LoginForm() {
             sx={{ mt: 3, p: 1.5 }}
             onClick={handleGoogleLogin}
           >
-            Sign in with Google{" "}
+            Login with Google{" "}
             <GoogleIcon color="primary" sx={{ ml: 1, mb: 0.5 }} />
           </Button>
           <Typography sx={{ mt: 3, textAlign: "center" }}>

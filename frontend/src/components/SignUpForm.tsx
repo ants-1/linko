@@ -11,6 +11,7 @@ import {
   Button,
   Card,
   Alert,
+  Divider,
 } from "@mui/material";
 
 export default function SignUpForm() {
@@ -19,7 +20,7 @@ export default function SignUpForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState(null);
-  const [fieldErrors, setFieldErrors] = useState<any>({}); 
+  const [fieldErrors, setFieldErrors] = useState<any>({});
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -137,6 +138,8 @@ export default function SignUpForm() {
           >
             {isLoading ? "Signing up..." : "Sign Up"}
           </Button>
+
+          <Divider sx={{ mt: 3 }}></Divider>
 
           <Typography sx={{ mt: 3, textAlign: "center" }}>
             Already have an account? <Link to="/">Login!</Link>

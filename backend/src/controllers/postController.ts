@@ -7,7 +7,7 @@ import { uploadImageCloudinary } from "../utils/cloudinary";
 import multer from "multer";
 import commentModel, { IComment } from "../models/commentModel";
 
-const upload = multer({ dest: "./public/data/uploads/" });
+const upload = multer({ dest: "./public/data/uploads/posts/" });
 
 // @desc    Get all posts
 // @route   GET /api/v1/posts
@@ -238,7 +238,6 @@ const createPost = [
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
       let imageUrl: any = "";
-      console.log("Request body:", req.body);
 
       if (req.file) {
         try {
@@ -296,6 +295,7 @@ const editPost = [
       }
 
       const existingPost = await postModel.findById(id);
+      
       if (!existingPost) {
         return res.status(404).json({ error: "Post not found." });
       }
