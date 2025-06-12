@@ -64,7 +64,7 @@ export default function LoginForm() {
   }
 
   const handleGoogleLogin = async () => {
-    window.location.href = "http://localhost:5001/api/v1/auth/google";
+    window.location.href = "https://linko-2hp9.onrender.com/api/v1/auth/google";
   }
 
   return (
